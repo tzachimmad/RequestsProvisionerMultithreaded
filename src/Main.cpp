@@ -107,7 +107,7 @@ int RequestProvisioner::Run() {
 		if (workers_running == 0) {
 			break;
 		}
-		sleep(1);
+		sleep(0.05);
 	}
 	PrintMessages();
 	return 0;
