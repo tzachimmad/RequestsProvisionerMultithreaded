@@ -23,9 +23,9 @@ using namespace std;
 
 int RequestProvisioner::FillSetFromFile(const std::string& path, std::set<std::string> &set) {
 	std::fstream f;
-	f.open(m_secure_sites_path.c_str(), ios::in);
+	f.open(path.c_str(), ios::in);
 	if (!f) {
-		cout << "Invalid file path " << m_secure_sites_path << " aborting" << endl;
+		cout << "Invalid file path " << path << " aborting" << endl;
 		return 1;
 	}
 	string line;
@@ -40,10 +40,9 @@ int RequestProvisioner::Init() {
 	if (FillSetFromFile(m_secure_sites_path, m_secure_hosts)) {
 		return 1;
 	}
-	if (FillSetFromFile(m_insecure_passwords_path, m_insecure_passwords)) {
+ 	if (FillSetFromFile(m_insecure_passwords_path, m_insecure_passwords)) {
 		return 1;
 	}
-
 	for (int i = 0; i < 4; i++) {
 		auto proccessor = make_shared<ReqProcessor>(i, m_secure_hosts, m_insecure_passwords, m_msg_queue);
 		m_worker_vec.push_back(proccessor);

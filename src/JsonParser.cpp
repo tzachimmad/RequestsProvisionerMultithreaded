@@ -31,7 +31,7 @@ void UserRequest::IncAnalysis(int inc) {
 int JsonParser::Init() {
 	m_f_input_json.open(m_path.c_str(), ios::in);
 	if (!m_f_input_json) {
-		cout << "Incorreqt input json path, aborting" << endl;
+		cout << "Incorrect input json path, aborting" << endl;
 		return 1;
 	}
 	m_initiated = true;
@@ -45,19 +45,37 @@ shared_ptr<UserRequest> JsonParser::GetNextReq() {
 		if(line.find("]") != std::string::npos ) {
 			break;
 		}
-		if (line.find("{") != std::string::npos) {
-			m_pos = 0;
+		if (line.find("{") != std::string::npos ) {
+			bool new_elem = true;
+			for (auto chr : line ) {
+				if (chr != '{' && chr != ' ') {
+					bool new_elem = false;
+					break;
+				}
+			}
+			if (new_elem) {
+				m_pos = 0;
+			}
 		}
 		if (line.find("}") != std::string::npos) {
-			string tmp = "}\0";
-			copy(tmp.c_str(), tmp.c_str()+tmp.length(), m_buffer.begin() + m_pos);
-			m_pos = 0;
-			auto ptr = ParseReq(m_req_num, &m_buffer[m_pos]);
-			if (ptr != NULL) {
-				m_req_num +=1;
-				return ptr;
+			bool new_elem = true;
+			for (auto chr : line ) {
+				if (chr != '}' && chr != ' ') {
+					bool new_elem = false;
+					break;
+				}
 			}
-			break;
+			if (new_elem) {
+				string tmp = "}\0";
+				copy(tmp.c_str(), tmp.c_str()+tmp.length(), m_buffer.begin() + m_pos);
+				m_pos = 0;
+				auto ptr = ParseReq(m_req_num, &m_buffer[m_pos]);
+				if (ptr != NULL) {
+					m_req_num +=1;
+					return ptr;
+				}
+				break;
+			}
 
 		}
 		copy(line.c_str(), line.c_str()+line.length(), m_buffer.begin() + m_pos);
