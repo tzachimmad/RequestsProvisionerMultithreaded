@@ -26,11 +26,10 @@ namespace common
 {
 using namespace std;
 
-EventQueue::EventQueue(int id) : m_id(id), m_events_list_size(0), m_stopping(false)
+EventQueue::EventQueue(int id) : m_id(id), m_stop_interval(0), m_events_list_size(0), m_stopping(false), m_running(false)
 {
 	m_base = event_base_new();
 	m_execute_event = event_new(m_base, -1, EV_TIMEOUT, ExecuteCallback, this);
-    m_running = false;
 }
 
 EventQueue::~EventQueue()
@@ -60,7 +59,6 @@ bool EventQueue::Start()
 		return false;
 	}
 	m_running = true;
-
 	return true;
 }
 
@@ -78,7 +76,7 @@ bool EventQueue::IsRunning()
 bool EventQueue::AddEvent(IEvent *event)
 {
 	if (m_stopping) {
-		return true;
+		return false;
 	}
 	bool out = true;
 	int tasks_list_size;
@@ -141,8 +139,13 @@ void EventQueue::ExecuteCallback(evutil_socket_t fd, short what, void *ctx)
 		delete task;
 	}
 	if (instance->m_stopping) {
-		instance->m_running = false;
-		return;
+		if (!instance->m_stop_interval) {
+			instance->m_stop_interval +=1;
+		}
+		else {
+			instance->m_running = false;
+			return;
+		}
 	}
 
 	timeval tm;

@@ -16,6 +16,7 @@
 #include <event2/listener.h>
 #include <event2/util.h>
 #include <event2/event.h>
+#include <atomic>
 #include <mutex>
 
 typedef unsigned int UINT32;
@@ -59,9 +60,10 @@ public:
 protected:
     static void ExecuteCallback(evutil_socket_t fd, short what, void *ctx);
     static void* ThreadFunc(void* arg);
-    bool m_stopping;
-    bool m_running;
     int m_id;
+    int m_stop_interval;
+    std::atomic<bool> m_stopping;
+    std::atomic<bool> m_running;
     int m_events_list_size;
     pthread_t m_tid;
     pthread_cond_t m_initCond;

@@ -76,43 +76,24 @@ int RequestProvisioner::PrintMessages()
 }
 
 int RequestProvisioner::Run() {
-	int index = 0;
-	JsonParser json_parser;
+	JsonParser json_parser (m_input_json_path);
+	if (json_parser.Init()) {
+		cout << "Failed to read input json file " << m_input_json_path << endl;
+		return 1;
+	}
 	{
-		vector<char> buffer(1024*1024);
-		std::fstream f_input_json;
-		f_input_json.open(m_input_json_path.c_str(), ios::in);
-		if (!f_input_json) {
-			cout << "Incorreqt input json path, aborting" << endl;
-			return 1;
-		}
-		string line;
-		int pos = 0;
-		while(getline(f_input_json, line))
+		shared_ptr<UserRequest> ptr;
+		while((ptr = json_parser.GetNextReq()) != NULL)
 		{
-			if(line.find("]") != std::string::npos ) {
-				break;
-			}
-			if (line.find("{") != std::string::npos) {
-				pos = 0;
-			}
-			if (line.find("}") != std::string::npos) {
-				string tmp = "}\0";
-				copy(tmp.c_str(), tmp.c_str()+tmp.length(), buffer.begin() + pos);
-				pos = 0;
-				auto ptr = json_parser.ParseReq(index, &buffer[pos]);
-				ProvisionReqAsync(ptr);
-				m_user_req_list.push_back(ptr);
-				PrintMessages();
-				index+=1;
-			}
-			copy(line.c_str(), line.c_str()+line.length(), buffer.begin() + pos);
-			pos += line.length();
+			ProvisionReqAsync(ptr);
+			m_user_req_list.push_back(ptr);
+			PrintMessages();
 		}
-		auto ptr = std::make_shared<UserRequest>(-1, "talon-last-req", "", "", "", "", "", "", TIME_POINT_T::max());
-		for (auto &proccessor : m_worker_vec) {
-			proccessor->AddReq(ptr);
-		}
+	}
+
+	auto ptr = std::make_shared<UserRequest>(-1, "talon-last-req", "", "", "", "", "", "", TIME_POINT_T::max());
+	for (auto &proccessor : m_worker_vec) {
+		proccessor->AddReq(ptr);
 	}
 
 	for (auto &proccessor : m_worker_vec) {

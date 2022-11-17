@@ -28,6 +28,43 @@ void UserRequest::IncAnalysis(int inc) {
 	m_analysis += inc;
 }
 
+int JsonParser::Init() {
+	m_f_input_json.open(m_path.c_str(), ios::in);
+	if (!m_f_input_json) {
+		cout << "Incorreqt input json path, aborting" << endl;
+		return 1;
+	}
+	m_initiated = true;
+	return 0;
+}
+
+shared_ptr<UserRequest> JsonParser::GetNextReq() {
+	string line;
+	while(getline(m_f_input_json, line))
+	{
+		if(line.find("]") != std::string::npos ) {
+			break;
+		}
+		if (line.find("{") != std::string::npos) {
+			m_pos = 0;
+		}
+		if (line.find("}") != std::string::npos) {
+			string tmp = "}\0";
+			copy(tmp.c_str(), tmp.c_str()+tmp.length(), m_buffer.begin() + m_pos);
+			m_pos = 0;
+			auto ptr = ParseReq(m_req_num, &m_buffer[m_pos]);
+			if (ptr != NULL) {
+				m_req_num +=1;
+				return ptr;
+			}
+			break;
+
+		}
+		copy(line.c_str(), line.c_str()+line.length(), m_buffer.begin() + m_pos);
+		m_pos += line.length();
+	}
+	return NULL;
+}
 
 shared_ptr<UserRequest> JsonParser::ParseReq(int id, const char* buff) {
 	Json::Reader reader;

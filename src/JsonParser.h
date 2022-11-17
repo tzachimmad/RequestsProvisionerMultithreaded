@@ -13,6 +13,8 @@
 #include <memory>
 #include <chrono>
 #include <atomic>
+#include <fstream>
+#include <vector>
 
 typedef std::chrono::system_clock::time_point TIME_POINT_T;
 
@@ -54,9 +56,19 @@ private:
 
 class JsonParser {
 public:
-	JsonParser(){}
+	JsonParser(const std::string path) : m_path(path), m_pos(0), m_req_num(0), m_buffer(1024*1024), m_initiated(false) {}
+	int Init();
+	std::shared_ptr<UserRequest> GetNextReq();
 	virtual ~JsonParser(){}
 	std::shared_ptr<UserRequest> ParseReq(int id, const char* buff);
+private:
+	const std::string m_path;
+	int m_pos;
+	int m_req_num;
+	std::vector<char> m_buffer;
+	std::fstream m_f_input_json;
+	bool m_initiated;
+
 };
 
 
