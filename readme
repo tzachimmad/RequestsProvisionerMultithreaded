@@ -7,6 +7,7 @@ affinity per thread is done via hashing username, so multiple insances of the sa
 username will be handled by the same thread.
 All prints to screen are done exclusively within RequestProvisioner class, the threads do not
 print messages, they add them to a message queue that RequestProvisioner is in charge of poping.
+Error messages can be printed out within individual threads.
 
 Regards and Enjoy
 Tzachi Lapidot
