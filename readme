@@ -1,1 +1,12 @@
-placeholder
+MultiThreaded cpp application for parsing requests for potential vulnerabilities.
+4 worker threads, within RequestProvisioner class. Worker threads are part of 
+RequestProccessor class, which inherits from EventQueue which is an eventloop class.
+Requests are read from a json file in chunks via JsonParser class within RequestProvisoner
+class. Each request is assigned a worker class to handle it async in a different thread, 
+affinity per thread is done via hashing username, so multiple insances of the same 
+username will be handled by the same thread.
+All prints to screen are done exclusively within RequestProvisioner class, the threads do not
+print messages, they add them to a message queue that RequestProvisioner is in charge of poping.
+
+Regards and Enjoy
+Tzachi Lapidot
