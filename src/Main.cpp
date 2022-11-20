@@ -67,7 +67,7 @@ int RequestProvisioner::PrintMessages()
 	{
 		cout << m_msg_queue.pop()->m_str;
 	}
-	while (m_user_req_list.front()->IsProccessed()) {
+	while (m_user_req_list.size() &&  m_user_req_list.front()->IsProccessed()) {
 		cout << m_user_req_list.front()->GetId() << ") " << m_user_req_list.front()->GetOutMsg();
 		m_user_req_list.pop_front();
 	}

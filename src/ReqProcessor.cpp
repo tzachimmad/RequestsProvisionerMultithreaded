@@ -117,12 +117,15 @@ int ReqProcessor::ProcessReq(std::shared_ptr<UserRequest> user_req) {
 		user_req->IncAnalysis(2);
 	}
 	UnCacheOldReqs(timestamp);
-
+	nanoseconds ten_sec_ns(10000000000);
 	for (auto &host_map_elem : m_user_map[username][password]) {
 		if (host_map_elem.first == host) {
 			continue;
 		}
 		auto diff = timestamp - host_map_elem.second.front()->GetTimestamp();
+		if (diff > ten_sec_ns) {
+			continue;
+		}
 		using date::operator<<;
 		stringstream ss_msg;
 		ss_msg << "Identical User/Password pair found diff under 10s: duration "  << floor<ms_rate>(diff) << " in host " << host << " user/pass: " << username << "/" << password << endl;

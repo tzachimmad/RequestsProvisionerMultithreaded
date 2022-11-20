@@ -1,10 +1,10 @@
 FROM ubuntu
 
-ADD RequestProvisioner.zip /install/RequestProvisioner.zip
+ADD RequestProvisionerMultithreaded.zip /install/RequestProvisionerMultithreaded.zip
 RUN apt-get update
 RUN apt-get -y install unzip gcc build-essential libjsoncpp-dev libhowardhinnant-date-dev
-RUN unzip /install/RequestProvisioner.zip -d /install/
-RUN cd /install/RequestProvisioner/libevent-2.1.12-stable && ./configure --disable-openssl && make && make install
-RUN cd /install/RequestProvisioner/Debug && make clean && make all
+RUN unzip /install/RequestProvisionerMultithreaded.zip -d /install/
+RUN cd /install/RequestProvisionerMultithreaded/libevent-2.1.12-stable && ./configure --disable-openssl && make && make install
+RUN cd /install/RequestProvisionerMultithreaded/Debug && make clean && make all
 RUN export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
 RUN ln -s /usr/local/lib/libevent-2.1.so.7 /usr/lib/libevent-2.1.so.7

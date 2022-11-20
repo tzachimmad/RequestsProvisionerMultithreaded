@@ -41,7 +41,8 @@ EventQueue::~EventQueue()
 
     for (auto taskIt : m_events_list)
     {
-        delete taskIt;
+    	if (taskIt)
+    		delete taskIt;
     }
 
 }

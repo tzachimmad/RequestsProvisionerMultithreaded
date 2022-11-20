@@ -108,12 +108,21 @@ shared_ptr<UserRequest> JsonParser::ParseReq(int id, const char* buff) {
 		}
 		if (tmp.find("user=") != std::string::npos) {
 			username = tmp.substr(tmp.find("=") + 1);
+			if (username[username.size()-1] == '"') {
+				username = username.substr(0, username.size()-1);
+			}
 		}
 		else if (tmp.find("tokenid=") != std::string::npos) {
 			tokenid = tmp.substr(tmp.find("=") + 1);
+			if (tokenid[tokenid.size()-1] == '"') {
+				tokenid = tokenid.substr(0, tokenid.size()-1);
+			}
 		}
 		else if (tmp.find("password=") != std::string::npos) {
 			password = tmp.substr(tmp.find("=") + 1);
+			if (password[password.size()-1] == '"') {
+				password = password.substr(0, password.size()-1);
+			}
 		}
 	}
 	if (!url.empty() || !host.empty() || timestamp == TIME_POINT_T()) {
